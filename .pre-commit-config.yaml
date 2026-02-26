@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: secrethawk-scan
+        name: SecretHawk staged scan
+        entry: go run ./cmd/secrethawk scan --staged --fail-on medium
+        language: system
+        pass_filenames: false

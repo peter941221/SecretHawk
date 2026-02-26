@@ -19,3 +19,6 @@
 - Phase 3 completed: implemented connector registry (AWS/GitHub), validate command, patch engine, remediate auto/dry-run flow, and history-clean safeguards.
 - Added phase-3 command tests covering connector listing, validation argument guard, patch dry-run, remediate dry-run, and dirty-repo protection for history-clean.
 - Scan --validate now uses connector mapping when possible.
+- Phase 4 completed: added SARIF/output regression tests, scan fail-on command test, GitHub secret-scan workflow, and pre-commit hook config.
+- Final regression run includes go test/build/help/policy test/connector list plus scan->report smoke path.
+- Repository now supports phased development flow with stage-wise push history.

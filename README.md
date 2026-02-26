@@ -1,23 +1,17 @@
 # SecretHawk
 
-SecretHawk is a Go CLI focused on secret remediation, not just secret detection.
+SecretHawk is a Go CLI focused on the full lifecycle of secret incidents: detect, validate, patch, baseline, and report.
 
-## Current status
-
-- Project scaffold initialized from PRD v0.1
-- Command tree stubbed and ready for feature development
-- Seed policy/rule/schema files added for local iteration
-
-## Command tree (MVP skeleton)
+## Implemented command map
 
 ```text
 secrethawk
-├── scan
-├── validate
-├── remediate
-├── patch
-├── history-clean
-├── report
+├── scan          # scan filesystem / staged / since / all-history + human/json/sarif
+├── validate      # validate secrets via connector (direct secret / findings file)
+├── remediate     # guided or auto remediation workflow
+├── patch         # replace hardcoded secrets with env/placeholder/secretmanager refs
+├── history-clean # guarded git history cleanup workflow
+├── report        # incident markdown report generator
 ├── policy
 │   ├── init
 │   ├── check
@@ -37,11 +31,16 @@ secrethawk
 ```bash
 go test ./...
 go build ./cmd/secrethawk
-./secrethawk.exe version
+./secrethawk.exe scan . --format human
 ```
 
-## Next milestone
+## CI / Hook
 
-- Implement `scan` engine and finding schema output (`json`, `human`)
-- Add rule loader and policy parser
-- Add baseline filtering path
+- GitHub Action: `.github/workflows/secret-scan.yml`
+- Pre-commit sample: `.pre-commit-config.yaml`
+
+## Notes
+
+- Connectors currently include `aws` and `github` with preflight + validation helpers.
+- `scan --validate` uses connector mapping when rule/connector are known.
+- `history-clean` enforces clean working tree and backup branch safeguards.

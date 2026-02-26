@@ -1,26 +1,41 @@
 # RUNBOOK
 
-## Build
-
-```bash
-go build ./cmd/secrethawk
-```
-
 ## Test
 
 ```bash
 go test ./...
 ```
 
-## Run
+## Build
 
 ```bash
-go run ./cmd/secrethawk --help
-go run ./cmd/secrethawk scan --help
+go build ./cmd/secrethawk
 ```
 
-## Local policy bootstrap
+## Core workflows
 
 ```bash
-go run ./cmd/secrethawk policy init
+# Scan
+./secrethawk.exe scan . --format human --fail-on high
+
+# Validate a token directly
+./secrethawk.exe validate --connector github --secret <token>
+
+# Patch secrets into env references
+./secrethawk.exe patch --target . --replace-with env
+
+# Remediate automatically
+./secrethawk.exe remediate --auto
+
+# Generate incident report from findings
+./secrethawk.exe report --input findings.json
+```
+
+## Policy / Baseline
+
+```bash
+./secrethawk.exe policy init
+./secrethawk.exe policy check
+./secrethawk.exe policy test
+./secrethawk.exe baseline create --input findings.json
 ```
