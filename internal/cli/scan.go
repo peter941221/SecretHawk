@@ -1,8 +1,14 @@
 package cli
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"strings"
+	"time"
 
+	"github.com/peter941221/secrethawk/internal/output"
+	"github.com/peter941221/secrethawk/internal/scan"
 	"github.com/spf13/cobra"
 )
 
@@ -35,8 +41,45 @@ func newScanCommand() *cobra.Command {
 				target = args[0]
 			}
 
-			// Placeholder: engine wiring comes in the next implementation milestone.
-			fmt.Fprintf(cmd.OutOrStdout(), "scan scaffold ready (target=%s format=%s)\n", target, opts.Format)
+			runOpts := scan.Options{
+				Target:             target,
+				Staged:             opts.Staged,
+				SinceRef:           opts.SinceRef,
+				AllHistory:         opts.AllHistory,
+				RulesPath:          opts.RulesPath,
+				PolicyPath:         opts.PolicyPath,
+				BaselinePath:       opts.BaselinePath,
+				Severity:           strings.ToLower(opts.Severity),
+				Validate:           opts.Validate,
+				FailOn:             strings.ToLower(opts.FailOn),
+				MaxTargetMegabytes: opts.MaxTargetMegabytes,
+				Threads:            opts.Threads,
+				Version:            BuildVersion,
+				Now:                time.Now().UTC(),
+			}
+
+			result, err := scan.Run(context.Background(), runOpts)
+			if err != nil {
+				return &ExitError{Code: 2, Message: err.Error()}
+			}
+
+			writer := cmd.OutOrStdout()
+			if opts.OutputPath != "" {
+				file, err := os.Create(opts.OutputPath)
+				if err != nil {
+					return &ExitError{Code: 2, Message: fmt.Sprintf("create output file: %v", err)}
+				}
+				defer file.Close()
+				writer = file
+			}
+
+			if err := output.Write(result.Report, opts.Format, writer); err != nil {
+				return &ExitError{Code: 2, Message: err.Error()}
+			}
+
+			if result.ShouldFail {
+				return &ExitError{Code: 1, Message: "findings reached fail-on threshold"}
+			}
 			return nil
 		},
 	}

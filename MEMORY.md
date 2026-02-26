@@ -10,3 +10,6 @@
 - Added Cobra-based CLI command tree scaffolding aligned with PRD command spec.
 - Seeded baseline project assets: `.secrethawk/policy.yaml`, `rules/aws.yaml`, `schemas/finding-v1.schema.json`.
 - Added initial unit tests for command tree + scan default flags.
+- Phase 1 completed: implemented scan engine with rule loading, policy allowlist, baseline suppression, severity threshold, fail-on exit logic, and human/json/sarif output.
+- Added unit tests for scan detection, allowlist, baseline suppression, and fail-on behavior.
+- Added severity utilities, baseline helpers, and output formatter package.

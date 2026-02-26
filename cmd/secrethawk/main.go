@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -9,7 +10,14 @@ import (
 
 func main() {
 	if err := cli.NewRootCommand().Execute(); err != nil {
+		var exitErr *cli.ExitError
+		if errors.As(err, &exitErr) {
+			if exitErr.Message != "" {
+				fmt.Fprintf(os.Stderr, "error: %v\n", exitErr)
+			}
+			os.Exit(exitErr.Code)
+		}
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		os.Exit(2)
 	}
 }

@@ -20,6 +20,7 @@ type Finding struct {
 	Match       Match       `json:"match"`
 	Validation  Validation  `json:"validation"`
 	Remediation Remediation `json:"remediation"`
+	LineHash    string      `json:"-"`
 }
 
 type Location struct {
@@ -41,10 +42,10 @@ type Match struct {
 }
 
 type Validation struct {
-	Status      string            `json:"status"`
-	ValidatedAt *time.Time        `json:"validated_at"`
-	Method      string            `json:"method"`
-	Details     map[string]string `json:"details"`
+	Status      string         `json:"status"`
+	ValidatedAt *time.Time     `json:"validated_at"`
+	Method      string         `json:"method"`
+	Details     map[string]any `json:"details"`
 }
 
 type Remediation struct {
