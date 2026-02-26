@@ -24,6 +24,7 @@ type scanOptions struct {
 	Severity           string
 	Validate           bool
 	FailOn             string
+	FailOnActive       bool
 	MaxTargetMegabytes int
 	Threads            int
 }
@@ -50,8 +51,9 @@ func newScanCommand() *cobra.Command {
 				PolicyPath:         opts.PolicyPath,
 				BaselinePath:       opts.BaselinePath,
 				Severity:           strings.ToLower(opts.Severity),
-				Validate:           opts.Validate,
+				Validate:           opts.Validate || opts.FailOnActive,
 				FailOn:             strings.ToLower(opts.FailOn),
+				FailOnActive:       opts.FailOnActive,
 				MaxTargetMegabytes: opts.MaxTargetMegabytes,
 				Threads:            opts.Threads,
 				Version:            BuildVersion,
@@ -95,6 +97,7 @@ func newScanCommand() *cobra.Command {
 	cmd.Flags().StringVar(&opts.Severity, "severity", "low", "Minimum reported severity")
 	cmd.Flags().BoolVar(&opts.Validate, "validate", false, "Validate whether secrets are active")
 	cmd.Flags().StringVar(&opts.FailOn, "fail-on", "", "Exit non-zero when findings >= severity")
+	cmd.Flags().BoolVar(&opts.FailOnActive, "fail-on-active", false, "Only fail when validated ACTIVE findings reach --fail-on threshold (implies --validate)")
 	cmd.Flags().IntVar(&opts.MaxTargetMegabytes, "max-target-megabytes", 50, "Skip files larger than this size in MB")
 	cmd.Flags().IntVar(&opts.Threads, "threads", 0, "Parallel scanning workers (0=auto)")
 

@@ -32,6 +32,7 @@ secrethawk
 go test ./...
 go build ./cmd/secrethawk
 ./secrethawk.exe scan . --format human
+./secrethawk.exe scan . --validate --fail-on high --fail-on-active
 ```
 
 ## CI / Hook

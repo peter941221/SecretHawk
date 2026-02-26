@@ -17,6 +17,7 @@ go build ./cmd/secrethawk
 ```bash
 # Scan
 ./secrethawk.exe scan . --format human --fail-on high
+./secrethawk.exe scan . --validate --fail-on high --fail-on-active
 
 # Validate a token directly
 ./secrethawk.exe validate --connector github --secret <token>

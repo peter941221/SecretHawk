@@ -31,4 +31,12 @@ func TestScanFlagDefaults(t *testing.T) {
 			t.Fatalf("flag %q default = %q, want %q", tc.flag, got.DefValue, tc.want)
 		}
 	}
+
+	failOnActive := cmd.Flag("fail-on-active")
+	if failOnActive == nil {
+		t.Fatal("flag fail-on-active missing")
+	}
+	if failOnActive.DefValue != "false" {
+		t.Fatalf("flag fail-on-active default = %q, want false", failOnActive.DefValue)
+	}
 }

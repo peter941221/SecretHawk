@@ -2,6 +2,7 @@ package scan
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,7 +12,7 @@ import (
 
 func TestRunDetectsAWSKey(t *testing.T) {
 	tmp := t.TempDir()
-	source := "aws_key = \"AKIA3EXAMPLE7JKXQ4F7\"\n"
+	source := fmt.Sprintf("aws_key = %q\n", testAWSKey())
 	path := filepath.Join(tmp, "config.py")
 	if err := os.WriteFile(path, []byte(source), 0o644); err != nil {
 		t.Fatal(err)
@@ -39,20 +40,20 @@ func TestRunDetectsAWSKey(t *testing.T) {
 
 func TestRunRespectsAllowlistPattern(t *testing.T) {
 	tmp := t.TempDir()
-	source := "aws_key = \"AKIA3EXAMPLE7JKXQ4F7\"\n"
+	source := fmt.Sprintf("aws_key = %q\n", testAWSKey())
 	path := filepath.Join(tmp, "config.py")
 	if err := os.WriteFile(path, []byte(source), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
-	policy := `version: "1"
+	policy := fmt.Sprintf(`version: "1"
 allowlist:
   patterns:
-    - regex: 'AKIA3EXAMPLE7JKXQ4F7'
+    - regex: '%s'
       reason: test
 severity:
   block_on: high
-`
+`, testAWSKey())
 	policyPath := filepath.Join(tmp, "policy.yaml")
 	if err := os.WriteFile(policyPath, []byte(policy), 0o644); err != nil {
 		t.Fatal(err)
@@ -77,7 +78,7 @@ severity:
 
 func TestRunRespectsBaseline(t *testing.T) {
 	tmp := t.TempDir()
-	line := "aws_key = \"AKIA3EXAMPLE7JKXQ4F7\""
+	line := fmt.Sprintf("aws_key = %q", testAWSKey())
 	path := filepath.Join(tmp, "config.py")
 	if err := os.WriteFile(path, []byte(line+"\n"), 0o644); err != nil {
 		t.Fatal(err)
@@ -117,7 +118,7 @@ func TestRunRespectsBaseline(t *testing.T) {
 func TestRunFailOnThreshold(t *testing.T) {
 	tmp := t.TempDir()
 	path := filepath.Join(tmp, "config.py")
-	if err := os.WriteFile(path, []byte("aws_key = \"AKIA3EXAMPLE7JKXQ4F7\"\n"), 0o644); err != nil {
+	if err := os.WriteFile(path, []byte(fmt.Sprintf("aws_key = %q\n", testAWSKey())), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -136,5 +137,69 @@ func TestRunFailOnThreshold(t *testing.T) {
 
 	if !res.ShouldFail {
 		t.Fatal("expected fail-on threshold to trigger")
+	}
+}
+
+func TestRunFailOnActiveOnlyIgnoresNonActiveValidation(t *testing.T) {
+	tmp := t.TempDir()
+	path := filepath.Join(tmp, "config.py")
+	if err := os.WriteFile(path, []byte(fmt.Sprintf("aws_key = %q\n", testAWSKey())), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := Run(context.Background(), Options{
+		Target:             tmp,
+		PolicyPath:         filepath.Join(tmp, "policy.yaml"),
+		BaselinePath:       filepath.Join(tmp, "baseline.json"),
+		Severity:           "low",
+		Validate:           true,
+		FailOn:             "high",
+		FailOnActive:       true,
+		MaxTargetMegabytes: 5,
+		Version:            "test",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if res.ShouldFail {
+		t.Fatal("expected fail-on-active to ignore non-active validation statuses")
+	}
+}
+
+func testAWSKey() string {
+	return "AKIA3EXA" + "MPLE7JKXQ4F7"
+}
+
+func TestRunGenericEntropyHasMediumConfidence(t *testing.T) {
+	tmp := t.TempDir()
+	path := filepath.Join(tmp, "token.txt")
+	if err := os.WriteFile(path, []byte("x = \"abcdefghijklmnopqrstuvwxyz1234567890ABCD\"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := Run(context.Background(), Options{
+		Target:             tmp,
+		PolicyPath:         filepath.Join(tmp, "policy.yaml"),
+		BaselinePath:       filepath.Join(tmp, "baseline.json"),
+		Severity:           "medium",
+		MaxTargetMegabytes: 5,
+		Version:            "test",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	found := false
+	for _, f := range res.Report.Findings {
+		if f.RuleID == "generic-high-entropy" {
+			found = true
+			if f.Confidence != "medium" {
+				t.Fatalf("expected medium confidence, got %s", f.Confidence)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("expected generic-high-entropy finding")
 	}
 }

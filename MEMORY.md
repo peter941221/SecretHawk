@@ -29,3 +29,6 @@
 - Completed competitor research (GitHub Secret Protection, GitGuardian, TruffleHog, Gitleaks, detect-secrets) and documented opportunity map in `COMPETITOR_RESEARCH_2026Q1.md`.
 - Defined 90-day reinforcement roadmap focused on verification intelligence, remediation automation, and governance.
 - Updated repository hygiene: added `技术文档.md` and `COMPETITOR_RESEARCH_2026Q1.md` to `.gitignore` and removed both from Git tracking while keeping local copies.
+- Implemented `scan --fail-on-active` to gate CI on validated ACTIVE findings only (auto-enables validation).
+- Added confidence refinement in scan pipeline and displayed confidence+status in human output.
+- Updated CI workflow to use `--validate --fail-on-active` and added regression tests for new scan behavior.

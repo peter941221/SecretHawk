@@ -30,9 +30,8 @@ func writeHuman(report model.FindingReport, w io.Writer) {
 		fmt.Fprintf(w, "%s %s\n", severityBadge(f.Severity), strings.ToUpper(f.RuleName))
 		fmt.Fprintf(w, "  File:   %s:%d\n", f.Location.File, f.Location.LineStart)
 		fmt.Fprintf(w, "  Match:  %s\n", f.Match.RawRedacted)
-		if f.Validation.Status != "" && f.Validation.Status != "unknown" {
-			fmt.Fprintf(w, "  Status: %s\n", strings.ToUpper(f.Validation.Status))
-		}
+		fmt.Fprintf(w, "  Confidence: %s\n", strings.ToUpper(f.Confidence))
+		fmt.Fprintf(w, "  Status: %s\n", strings.ToUpper(defaultValidationStatus(f.Validation.Status)))
 		fmt.Fprintln(w)
 	}
 	fmt.Fprintf(w, "Summary: %d findings\n", len(report.Findings))
@@ -133,4 +132,11 @@ func sarifLevel(level string) string {
 	default:
 		return "note"
 	}
+}
+
+func defaultValidationStatus(status string) string {
+	if strings.TrimSpace(status) == "" {
+		return "unknown"
+	}
+	return status
 }

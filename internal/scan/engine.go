@@ -39,6 +39,7 @@ type Options struct {
 	Severity           string
 	Validate           bool
 	FailOn             string
+	FailOnActive       bool
 	MaxTargetMegabytes int
 	Threads            int
 	Version            string
@@ -139,6 +140,7 @@ func Run(ctx context.Context, opts Options) (Result, error) {
 			filtered[i].Validation.Status = status
 			filtered[i].Validation.Method = c.Name()
 			filtered[i].Validation.Details = details
+			filtered[i].Confidence = confidenceFromValidation(filtered[i].Confidence, status)
 		}
 	}
 
@@ -172,6 +174,9 @@ func Run(ctx context.Context, opts Options) (Result, error) {
 			return Result{}, err
 		}
 		for _, f := range filtered {
+			if opts.FailOnActive && f.Validation.Status != "active" {
+				continue
+			}
 			if severity.MeetsOrAbove(f.Severity, failOn) {
 				shouldFail = true
 				break
@@ -408,7 +413,7 @@ func makeFinding(path string, lineNo int, secret string, line string, ruleID str
 		RuleID:     ruleID,
 		RuleName:   ruleName,
 		Severity:   sev,
-		Confidence: "high",
+		Confidence: baseConfidence(ruleID),
 		Category:   category,
 		Location: model.Location{
 			File:        path,
@@ -434,6 +439,32 @@ func makeFinding(path string, lineNo int, secret string, line string, ruleID str
 		},
 		LineHash:  lineHash,
 		RawSecret: secret,
+	}
+}
+
+func baseConfidence(ruleID string) string {
+	if ruleID == "generic-high-entropy" {
+		return "medium"
+	}
+	return "high"
+}
+
+func confidenceFromValidation(current string, validationStatus string) string {
+	switch validationStatus {
+	case "active", "inactive":
+		return "high"
+	case "unknown":
+		if current == "" {
+			return "medium"
+		}
+		return current
+	case "error":
+		return "low"
+	default:
+		if current == "" {
+			return "medium"
+		}
+		return current
 	}
 }
 

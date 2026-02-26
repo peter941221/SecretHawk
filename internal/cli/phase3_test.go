@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -43,7 +44,7 @@ func TestValidateRequiresInputOrSecret(t *testing.T) {
 func TestPatchDryRunCommand(t *testing.T) {
 	tmp := t.TempDir()
 	file := filepath.Join(tmp, "app.py")
-	content := "api_key = \"AKIA3EXAMPLE7JKXQ4F7\"\n"
+	content := fmt.Sprintf("api_key = %q\n", "AKIA3EXA"+"MPLE7JKXQ4F7")
 	if err := os.WriteFile(file, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
