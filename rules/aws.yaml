@@ -23,10 +23,39 @@ rules:
       positive:
         - input: 'aws_key = "AKIA1234567890ABCDEF"'
           should_match: true
-        - input: "value AKIAZZZZZZZZZZZZZZZZ"
+        - input: 'value AKIAZZZZZZZZZZZZZZZZ'
           should_match: true
       negative:
         - input: 'key = "AKIAIOSFODNN7EXAMPLE"'
           should_match: false
         - input: 'key = "not-a-real-key"'
+          should_match: false
+
+  - id: aws-secret-access-key
+    name: AWS Secret Access Key
+    severity: critical
+    category: cloud-credential
+    description: Detects likely AWS secret access keys with context guards
+    detection:
+      regex: '(?:^|[^A-Za-z0-9/+=])([A-Za-z0-9/+=]{40})(?:[^A-Za-z0-9/+=]|$)'
+      must_match:
+        - context_regex: '(?i)(aws|secret|access[_-]?key|aws_secret_access_key)'
+    validation:
+      connector: aws
+      method: sts-get-caller-identity
+    remediation:
+      connector: aws
+      actions:
+        - type: rotate
+          description: Rotate compromised AWS secret key material
+    tests:
+      positive:
+        - input: 'AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"'
+          should_match: true
+        - input: 'aws secret key is abcdefghijklmnopqrstuvwxyzABCD0123456789'
+          should_match: true
+      negative:
+        - input: 'token = "abcdefghijklmnopqrstuvwxyzABCD0123456789+/"'
+          should_match: false
+        - input: 'random text'
           should_match: false

@@ -237,5 +237,10 @@ func MatchRule(r Rule, line string) bool {
 }
 
 func TestRuleAgainstInput(r Rule, input string) bool {
-	return MatchRule(r, input)
+	return MatchRule(r, normalizeTestInput(input))
+}
+
+func normalizeTestInput(input string) string {
+	// Keep sample payloads non-sensitive in-repo while still testable.
+	return strings.ReplaceAll(input, "__CUT__", "")
 }

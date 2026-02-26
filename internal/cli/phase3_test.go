@@ -23,7 +23,7 @@ func TestConnectorListCommand(t *testing.T) {
 		t.Fatalf("connector list failed: %v", err)
 	}
 	text := out.String()
-	if !strings.Contains(text, "aws") || !strings.Contains(text, "github") {
+	if !strings.Contains(text, "aws") || !strings.Contains(text, "github") || !strings.Contains(text, "slack") || !strings.Contains(text, "stripe") {
 		t.Fatalf("unexpected connector list output: %s", text)
 	}
 }

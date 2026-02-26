@@ -1,0 +1,81 @@
+rules:
+  - id: github-pat-classic
+    name: GitHub PAT Classic
+    severity: high
+    category: scm-credential
+    description: Detects GitHub classic personal access tokens
+    detection:
+      regex: '(?:^|[^A-Za-z0-9_])(ghp_[A-Za-z0-9]{36})(?:[^A-Za-z0-9_]|$)'
+    validation:
+      connector: github
+      method: get-user
+    remediation:
+      connector: github
+      actions:
+        - type: revoke
+          description: Revoke compromised token in GitHub settings
+    tests:
+      positive:
+        - input: 'token=ghp_1234567890abcde__CUT__fghij1234567890abcdef'
+          should_match: true
+        - input: 'export GITHUB_TOKEN=ghp_AAAAAAAAAAAAAAAA__CUT__AAAAAAAAAAAAAAAAAAAA'
+          should_match: true
+      negative:
+        - input: 'token=ghp_short'
+          should_match: false
+        - input: 'hello world'
+          should_match: false
+
+  - id: github-pat-fine-grained
+    name: GitHub PAT Fine-Grained
+    severity: high
+    category: scm-credential
+    description: Detects GitHub fine-grained personal access tokens
+    detection:
+      regex: '(?:^|[^A-Za-z0-9_])(github_pat_[A-Za-z0-9_]{60,})(?:[^A-Za-z0-9_]|$)'
+    validation:
+      connector: github
+      method: get-user
+    remediation:
+      connector: github
+      actions:
+        - type: revoke
+          description: Revoke token in GitHub settings
+    tests:
+      positive:
+        - input: 'github_pat_AAAABBBBCCCCDDDDEEEEFFFF__CUT__GGGGHHHHIIIIJJJJKKKKLLLLMMMMNNNNOOOOPPPPQQQQ'
+          should_match: true
+        - input: 'x github_pat_ABCDEFGHIJKLMNOPQRSTUVWXYZabc__CUT__defghijklmnopqrstuvwxyz0123456789ABCD z'
+          should_match: true
+      negative:
+        - input: 'github_pat_short'
+          should_match: false
+        - input: 'just docs'
+          should_match: false
+
+  - id: github-oauth-token
+    name: GitHub OAuth/App Token
+    severity: high
+    category: scm-credential
+    description: Detects GitHub OAuth and app tokens (gho/ghu/ghs/ghr)
+    detection:
+      regex: '(?:^|[^A-Za-z0-9_])((?:gho|ghu|ghs|ghr)_[A-Za-z0-9]{36})(?:[^A-Za-z0-9_]|$)'
+    validation:
+      connector: github
+      method: get-user
+    remediation:
+      connector: github
+      actions:
+        - type: revoke
+          description: Revoke token in GitHub settings/apps
+    tests:
+      positive:
+        - input: 'oauth=gho_1234567890abcdefghij__CUT__1234567890abcdef'
+          should_match: true
+        - input: 'u=ghu_AAAAAAAAAAAAAAAAAA__CUT__AAAAAAAAAAAAAAAAAA'
+          should_match: true
+      negative:
+        - input: 'ghx_1234567890abcdefghij1234567890abcdef'
+          should_match: false
+        - input: 'none'
+          should_match: false

@@ -22,3 +22,7 @@
 - Phase 4 completed: added SARIF/output regression tests, scan fail-on command test, GitHub secret-scan workflow, and pre-commit hook config.
 - Final regression run includes go test/build/help/policy test/connector list plus scan->report smoke path.
 - Repository now supports phased development flow with stage-wise push history.
+- Enhanced built-in rule coverage to include AWS secret key, GitHub PAT/OAuth tokens, Slack token/webhook, Stripe API key, and private key header.
+- Added Slack/Stripe connectors to registry as manual-guidance connectors and aligned connector-rule mapping.
+- Hardened patch engine to skip generic entropy findings and non-code files, plus target-scoped `.env.example` generation.
+- Added regression tests for built-in rule catalog and patch file-scope safety.

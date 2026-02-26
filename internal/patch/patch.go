@@ -73,6 +73,12 @@ func Apply(ctx context.Context, opts Options) (Result, error) {
 		if f.Location.Commit != nil {
 			continue
 		}
+		if f.RuleID == "generic-high-entropy" {
+			continue
+		}
+		if !isPatchableCodeFile(f.Location.File) {
+			continue
+		}
 		grouped[f.Location.File] = append(grouped[f.Location.File], f)
 	}
 
@@ -121,7 +127,7 @@ func Apply(ctx context.Context, opts Options) (Result, error) {
 	}
 
 	if opts.ReplaceWith == "env" && !opts.DryRun && len(varsToAdd) > 0 {
-		if err := appendEnvExample(varsToAdd); err != nil {
+		if err := appendEnvExample(varsToAdd, opts.Target); err != nil {
 			return Result{}, err
 		}
 	}
@@ -167,8 +173,12 @@ func replacementByFile(file string, varName string, replaceWith string) string {
 	}
 }
 
-func appendEnvExample(vars map[string]struct{}) error {
-	path := ".env.example"
+func appendEnvExample(vars map[string]struct{}, target string) error {
+	root := target
+	if root == "" {
+		root = "."
+	}
+	path := filepath.Join(root, ".env.example")
 	existing := ""
 	if data, err := os.ReadFile(path); err == nil {
 		existing = string(data)
@@ -197,4 +207,14 @@ func appendEnvExample(vars map[string]struct{}) error {
 	}
 
 	return os.WriteFile(path, []byte(b.String()), 0o644)
+}
+
+func isPatchableCodeFile(path string) bool {
+	ext := strings.ToLower(filepath.Ext(path))
+	switch ext {
+	case ".py", ".js", ".jsx", ".ts", ".tsx", ".go", ".sh", ".bash", ".zsh", ".ps1":
+		return true
+	default:
+		return false
+	}
 }

@@ -9,6 +9,8 @@ func Registry() []Connector {
 	return []Connector{
 		newAWSConnector(),
 		newGitHubConnector(),
+		newSlackConnector(),
+		newStripeConnector(),
 	}
 }
 

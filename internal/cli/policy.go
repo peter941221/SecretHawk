@@ -19,6 +19,8 @@ allowlist:
   patterns:
     - regex: "AKIAIOSFODNN7EXAMPLE"
       reason: "AWS official example key"
+    - regex: "sk_test_[A-Za-z0-9]+"
+      reason: "Stripe test key can be ignored in demo data"
 severity:
   block_on: high
 `

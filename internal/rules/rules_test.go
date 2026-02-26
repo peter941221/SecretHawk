@@ -2,32 +2,21 @@ package rules
 
 import "testing"
 
-func TestAwsRuleMatchesAllBundledCases(t *testing.T) {
+func TestAllRulesMatchBundledCases(t *testing.T) {
 	rs, err := Load("../../rules", "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	var rule Rule
-	found := false
-	for _, r := range rs {
-		if r.ID == "aws-access-key-id" {
-			rule = r
-			found = true
-			break
+	for _, rule := range rs {
+		for _, tc := range rule.Tests.Positive {
+			if !TestRuleAgainstInput(rule, tc.Input) {
+				t.Fatalf("rule=%s positive case did not match: %q", rule.ID, tc.Input)
+			}
 		}
-	}
-	if !found {
-		t.Fatal("rule not found")
-	}
-
-	for _, tc := range rule.Tests.Positive {
-		if !MatchRule(rule, tc.Input) {
-			t.Fatalf("positive case did not match: %q", tc.Input)
-		}
-	}
-	for _, tc := range rule.Tests.Negative {
-		if MatchRule(rule, tc.Input) {
-			t.Fatalf("negative case matched unexpectedly: %q", tc.Input)
+		for _, tc := range rule.Tests.Negative {
+			if TestRuleAgainstInput(rule, tc.Input) {
+				t.Fatalf("rule=%s negative case matched unexpectedly: %q", rule.ID, tc.Input)
+			}
 		}
 	}
 }

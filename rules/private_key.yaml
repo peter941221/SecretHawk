@@ -1,0 +1,24 @@
+rules:
+  - id: private-key-header
+    name: Private Key Header
+    severity: critical
+    category: private-key
+    description: Detects PEM private key headers
+    detection:
+      regex: '(-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----)'
+    remediation:
+      connector: generic
+      actions:
+        - type: code-replace
+          description: Move private key to secret manager
+    tests:
+      positive:
+        - input: '-----BEGIN PRIVATE KEY-----'
+          should_match: true
+        - input: '-----BEGIN RSA PRIVATE KEY-----'
+          should_match: true
+      negative:
+        - input: '-----BEGIN CERTIFICATE-----'
+          should_match: false
+        - input: 'private key note'
+          should_match: false

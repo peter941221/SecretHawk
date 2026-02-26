@@ -14,9 +14,15 @@ type githubConnector struct{}
 
 func newGitHubConnector() Connector { return githubConnector{} }
 
-func (githubConnector) Name() string               { return "github" }
-func (githubConnector) DisplayName() string        { return "GitHub" }
-func (githubConnector) SupportedRuleIDs() []string { return []string{"github-pat", "github-oauth-app"} }
+func (githubConnector) Name() string        { return "github" }
+func (githubConnector) DisplayName() string { return "GitHub" }
+func (githubConnector) SupportedRuleIDs() []string {
+	return []string{
+		"github-pat-classic",
+		"github-pat-fine-grained",
+		"github-oauth-token",
+	}
+}
 
 func (githubConnector) Validate(ctx context.Context, secret string) (*ValidationResult, error) {
 	if strings.Contains(secret, "...") {

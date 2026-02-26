@@ -1,0 +1,27 @@
+rules:
+  - id: stripe-api-key
+    name: Stripe API Key
+    severity: high
+    category: payment-credential
+    description: Detects Stripe live and test API keys
+    detection:
+      regex: '(?:^|[^A-Za-z0-9_])(sk_(?:live|test)_[A-Za-z0-9]{24,})(?:[^A-Za-z0-9_]|$)'
+    validation:
+      connector: stripe
+      method: list-charges
+    remediation:
+      connector: stripe
+      actions:
+        - type: rotate
+          description: Rotate key in Stripe dashboard
+    tests:
+      positive:
+        - input: 'STRIPE_KEY=sk_live_abcdefghijklm__CUT__nopqrstuvwxyz123456'
+          should_match: true
+        - input: 'k=sk_test_ABCDEFGHIJKLMN__CUT__OPQRSTUVWXYZ123456'
+          should_match: true
+      negative:
+        - input: 'pk_live_abcdefghijklmnopqrstuvwxyz123456'
+          should_match: false
+        - input: 'stripe none'
+          should_match: false

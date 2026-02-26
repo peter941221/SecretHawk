@@ -1,0 +1,54 @@
+rules:
+  - id: slack-bot-token
+    name: Slack Bot Token
+    severity: high
+    category: collaboration-credential
+    description: Detects Slack bot/user tokens
+    detection:
+      regex: '(?:^|[^A-Za-z0-9_])(xox[baprs]-[0-9]{10,13}-[0-9]{10,13}-[A-Za-z0-9-]{20,})(?:[^A-Za-z0-9_]|$)'
+    validation:
+      connector: slack
+      method: auth-test
+    remediation:
+      connector: slack
+      actions:
+        - type: revoke
+          description: Revoke or rotate token in Slack app settings
+    tests:
+      positive:
+        - input: 'SLACK_TOKEN=xoxb-123456789012-123456789012-abcdefghi__CUT__jklmnopqrstuvwx'
+          should_match: true
+        - input: 't=xoxp-123456789012-123456789012-ABCDEFGHIJKL__CUT__MNOPQRSTUVWX'
+          should_match: true
+      negative:
+        - input: 'xoxb-short'
+          should_match: false
+        - input: 'hello'
+          should_match: false
+
+  - id: slack-webhook-url
+    name: Slack Webhook URL
+    severity: high
+    category: collaboration-credential
+    description: Detects Slack incoming webhook URLs
+    detection:
+      regex: '(https://hooks\.slack\.com/services/T[A-Z0-9]{8,}/B[A-Z0-9]{8,}/[A-Za-z0-9]{20,})'
+    validation:
+      connector: slack
+      method: webhook-check
+    remediation:
+      connector: slack
+      actions:
+        - type: revoke
+          description: Rotate webhook in Slack app settings
+    tests:
+      positive:
+        - input: 'url=https://hooks.slack.com/services/T12345678/B12345678/abcdefghij__CUT__klmnopqrstuvwx'
+          should_match: true
+        - input: 'https://hooks.slack.com/services/TABCDEFGH/BABCDEFGH/ZZZZZZZZZZZZ__CUT__ZZZZZZZZZZZZ'
+          should_match: true
+      negative:
+        - input: 'https://hooks.slack.com/services/T1/B1/x'
+          should_match: false
+        - input: 'no webhook here'
+          should_match: false
