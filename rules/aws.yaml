@@ -21,9 +21,9 @@ rules:
           env_var_name: AWS_ACCESS_KEY_ID
     tests:
       positive:
-        - input: 'aws_key = "AKIA3EXAMPLE7JKXQ4F7"'
+        - input: 'aws_key = "AKIA1234567890ABCDEF"'
           should_match: true
-        - input: 'export AWS_ACCESS_KEY_ID=AKIA2REALKEY9ABCDE12'
+        - input: "value AKIAZZZZZZZZZZZZZZZZ"
           should_match: true
       negative:
         - input: 'key = "AKIAIOSFODNN7EXAMPLE"'

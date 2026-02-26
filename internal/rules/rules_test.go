@@ -2,7 +2,7 @@ package rules
 
 import "testing"
 
-func TestAwsRuleMatchesSample(t *testing.T) {
+func TestAwsRuleMatchesAllBundledCases(t *testing.T) {
 	rs, err := Load("../../rules", "")
 	if err != nil {
 		t.Fatal(err)
@@ -19,8 +19,15 @@ func TestAwsRuleMatchesSample(t *testing.T) {
 	if !found {
 		t.Fatal("rule not found")
 	}
-	line := "aws_key = \"AKIA3EXAMPLE7JKXQ4F7\""
-	if !MatchRule(rule, line) {
-		t.Fatal("expected regex match")
+
+	for _, tc := range rule.Tests.Positive {
+		if !MatchRule(rule, tc.Input) {
+			t.Fatalf("positive case did not match: %q", tc.Input)
+		}
+	}
+	for _, tc := range rule.Tests.Negative {
+		if MatchRule(rule, tc.Input) {
+			t.Fatalf("negative case matched unexpectedly: %q", tc.Input)
+		}
 	}
 }

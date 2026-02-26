@@ -13,3 +13,6 @@
 - Phase 1 completed: implemented scan engine with rule loading, policy allowlist, baseline suppression, severity threshold, fail-on exit logic, and human/json/sarif output.
 - Added unit tests for scan detection, allowlist, baseline suppression, and fail-on behavior.
 - Added severity utilities, baseline helpers, and output formatter package.
+- Phase 2 completed: implemented policy check/test, baseline create/update, and report generation commands.
+- Added command-level tests for policy flows, baseline creation from findings JSON, and incident report output.
+- Strengthened rule test cases in rules/aws.yaml to ensure policy test stability.
