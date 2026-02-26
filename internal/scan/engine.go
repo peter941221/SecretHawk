@@ -22,6 +22,7 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/peter941221/secrethawk/internal/baseline"
 	"github.com/peter941221/secrethawk/internal/config"
+	"github.com/peter941221/secrethawk/internal/connector"
 	"github.com/peter941221/secrethawk/internal/model"
 	"github.com/peter941221/secrethawk/internal/rules"
 	"github.com/peter941221/secrethawk/internal/severity"
@@ -125,11 +126,19 @@ func Run(ctx context.Context, opts Options) (Result, error) {
 	}
 
 	if opts.Validate {
-		now := time.Now().UTC()
 		for i := range filtered {
-			filtered[i].Validation.Status = "unknown"
+			now := time.Now().UTC()
 			filtered[i].Validation.ValidatedAt = &now
-			filtered[i].Validation.Method = "not-implemented"
+			c := connector.FindByRuleID(filtered[i].RuleID)
+			if c == nil {
+				filtered[i].Validation.Status = "unknown"
+				filtered[i].Validation.Method = "no-connector"
+				continue
+			}
+			status, details := connector.ValidateWithConnector(ctx, c, filtered[i].RawSecret)
+			filtered[i].Validation.Status = status
+			filtered[i].Validation.Method = c.Name()
+			filtered[i].Validation.Details = details
 		}
 	}
 
@@ -423,7 +432,8 @@ func makeFinding(path string, lineNo int, secret string, line string, ruleID str
 			Status:       "pending",
 			ActionsTaken: []string{},
 		},
-		LineHash: lineHash,
+		LineHash:  lineHash,
+		RawSecret: secret,
 	}
 }
 

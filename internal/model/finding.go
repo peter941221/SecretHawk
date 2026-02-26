@@ -21,6 +21,7 @@ type Finding struct {
 	Validation  Validation  `json:"validation"`
 	Remediation Remediation `json:"remediation"`
 	LineHash    string      `json:"-"`
+	RawSecret   string      `json:"-"`
 }
 
 type Location struct {

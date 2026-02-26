@@ -16,3 +16,6 @@
 - Phase 2 completed: implemented policy check/test, baseline create/update, and report generation commands.
 - Added command-level tests for policy flows, baseline creation from findings JSON, and incident report output.
 - Strengthened rule test cases in rules/aws.yaml to ensure policy test stability.
+- Phase 3 completed: implemented connector registry (AWS/GitHub), validate command, patch engine, remediate auto/dry-run flow, and history-clean safeguards.
+- Added phase-3 command tests covering connector listing, validation argument guard, patch dry-run, remediate dry-run, and dirty-repo protection for history-clean.
+- Scan --validate now uses connector mapping when possible.
