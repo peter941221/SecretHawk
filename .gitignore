@@ -24,3 +24,7 @@ Thumbs.db
 # SecretHawk local state
 .secrethawk/reports/
 .secrethawk/tmp/
+
+# Local planning/research docs (keep local, do not sync)
+技术文档.md
+COMPETITOR_RESEARCH_2026Q1.md
