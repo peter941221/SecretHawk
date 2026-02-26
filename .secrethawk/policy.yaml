@@ -1,0 +1,15 @@
+version: "1"
+scan:
+  default_mode: since-last-baseline
+  exclude_paths:
+    - "vendor/**"
+    - "node_modules/**"
+    - "**/*_test.go"
+    - "docs/examples/**"
+  max_file_size_kb: 500
+allowlist:
+  patterns:
+    - regex: 'AKIAIOSFODNN7EXAMPLE'
+      reason: "AWS official example key"
+severity:
+  block_on: high

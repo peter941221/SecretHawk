@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://secrethawk.dev/schemas/finding-v1.json",
+  "title": "SecretHawk Finding Report v1",
+  "type": "object",
+  "required": ["findings", "metadata"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "rule_id", "rule_name", "severity", "location", "match"],
+        "properties": {
+          "id": {"type": "string"},
+          "rule_id": {"type": "string"},
+          "rule_name": {"type": "string"},
+          "severity": {"type": "string", "enum": ["critical", "high", "medium", "low"]},
+          "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+          "category": {"type": "string"},
+          "location": {
+            "type": "object",
+            "required": ["file", "line_start", "line_end"],
+            "properties": {
+              "file": {"type": "string"},
+              "line_start": {"type": "integer", "minimum": 1},
+              "line_end": {"type": "integer", "minimum": 1},
+              "column_start": {"type": "integer", "minimum": 1},
+              "column_end": {"type": "integer", "minimum": 1},
+              "commit": {"type": ["string", "null"]},
+              "branch": {"type": "string"},
+              "author_email": {"type": "string"},
+              "committed_at": {"type": ["string", "null"], "format": "date-time"}
+            }
+          },
+          "match": {
+            "type": "object",
+            "required": ["raw_redacted", "length"],
+            "properties": {
+              "raw_redacted": {"type": "string"},
+              "entropy": {"type": "number"},
+              "length": {"type": "integer", "minimum": 1}
+            }
+          },
+          "validation": {"type": "object"},
+          "remediation": {"type": "object"}
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["tool", "version", "scanned_at", "scan_target", "scan_mode", "files_scanned", "duration_ms", "rules_loaded", "policy_file"],
+      "properties": {
+        "tool": {"type": "string"},
+        "version": {"type": "string"},
+        "scanned_at": {"type": "string", "format": "date-time"},
+        "scan_target": {"type": "string"},
+        "scan_mode": {"type": "string"},
+        "files_scanned": {"type": "integer", "minimum": 0},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "rules_loaded": {"type": "integer", "minimum": 0},
+        "policy_file": {"type": "string"}
+      }
+    }
+  }
+}
