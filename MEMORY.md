@@ -26,3 +26,5 @@
 - Added Slack/Stripe connectors to registry as manual-guidance connectors and aligned connector-rule mapping.
 - Hardened patch engine to skip generic entropy findings and non-code files, plus target-scoped `.env.example` generation.
 - Added regression tests for built-in rule catalog and patch file-scope safety.
+- Completed competitor research (GitHub Secret Protection, GitGuardian, TruffleHog, Gitleaks, detect-secrets) and documented opportunity map in `COMPETITOR_RESEARCH_2026Q1.md`.
+- Defined 90-day reinforcement roadmap focused on verification intelligence, remediation automation, and governance.
