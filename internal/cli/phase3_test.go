@@ -12,7 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/peter941221/secrethawk/internal/cisync"
 	"github.com/peter941221/secrethawk/internal/model"
+	"github.com/peter941221/secrethawk/internal/patch"
 )
 
 func TestConnectorListCommand(t *testing.T) {
@@ -191,6 +193,66 @@ func TestRunConnectorRemediationForcedGithub(t *testing.T) {
 	if summary.Rotated != 1 {
 		t.Fatalf("expected 1 rotated, got %+v", summary)
 	}
+}
+
+func TestSyncPatchedSecretsToGitHubActionsMissingToken(t *testing.T) {
+	t.Setenv("GITHUB_TOKEN", "")
+	_, err := syncPatchedSecretsToGitHubActions(context.Background(), []patch.Change{{VarName: "AWS_ACCESS_KEY_ID"}}, "owner/repo", "GITHUB_TOKEN", &bytes.Buffer{})
+	if err == nil {
+		t.Fatal("expected token error")
+	}
+}
+
+func TestSyncPatchedSecretsToGitHubActionsSuccess(t *testing.T) {
+	t.Setenv("GITHUB_TOKEN", "token-x")
+	t.Setenv("GITHUB_REPOSITORY", "owner/repo")
+	t.Setenv("AWS_ACCESS_KEY_ID", "AKIA1111222233334444")
+	t.Setenv("AWS_SECRET_ACCESS_KEY", "secret-value")
+
+	oldFactory := newGitHubSecretSyncer
+	defer func() { newGitHubSecretSyncer = oldFactory }()
+
+	fake := &fakeSecretSyncer{}
+	newGitHubSecretSyncer = func(token string) githubSecretSyncer {
+		if token != "token-x" {
+			t.Fatalf("unexpected token: %s", token)
+		}
+		return fake
+	}
+
+	buf := &bytes.Buffer{}
+	summary, err := syncPatchedSecretsToGitHubActions(context.Background(), []patch.Change{
+		{VarName: "AWS_ACCESS_KEY_ID"},
+		{VarName: "AWS_SECRET_ACCESS_KEY"},
+		{VarName: "MISSING_SECRET"},
+	}, "", "GITHUB_TOKEN", buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if summary.Updated != 2 {
+		t.Fatalf("expected updated=2 got %+v", summary)
+	}
+	if summary.Skipped < 1 {
+		t.Fatalf("expected skipped>=1 got %+v", summary)
+	}
+	if fake.repo != "owner/repo" {
+		t.Fatalf("unexpected repo: %s", fake.repo)
+	}
+	if len(fake.values) != 2 {
+		t.Fatalf("unexpected values: %+v", fake.values)
+	}
+}
+
+type fakeSecretSyncer struct {
+	repo   string
+	values map[string]string
+}
+
+func (f *fakeSecretSyncer) SyncRepoSecrets(ctx context.Context, repo string, values map[string]string) (cisync.SyncResult, error) {
+	_ = ctx
+	f.repo = repo
+	f.values = values
+	return cisync.SyncResult{Attempted: len(values), Updated: len(values), Skipped: 0}, nil
 }
 
 func mustRun(t *testing.T, dir string, name string, args ...string) {

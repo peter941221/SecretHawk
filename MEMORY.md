@@ -39,3 +39,6 @@
 - Added connector remediation summary output and tests for forced connector flows.
 - Improved `validate --input` behavior: redacted values now map to `unknown/redacted-input` instead of connector error noise.
 - Added regression test to ensure redacted findings from JSON reports are handled safely.
+- Added GitHub Actions secret sync module (`internal/cisync`) with libsodium sealed-box encryption and API integration.
+- Integrated optional sync into `remediate --auto` via `--sync-github-actions`, `--github-repo`, and `--github-token-env`.
+- Added unit tests for GitHub Actions sync client and remediation sync orchestration.
