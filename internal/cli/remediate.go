@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/peter941221/secrethawk/internal/connector"
 	"github.com/peter941221/secrethawk/internal/model"
 	"github.com/peter941221/secrethawk/internal/patch"
 	"github.com/peter941221/secrethawk/internal/scan"
@@ -58,6 +59,11 @@ func newRemediateCommand() *cobra.Command {
 				return nil
 			}
 
+			connectorSummary, err := runConnectorRemediation(context.Background(), findings, connector)
+			if err != nil {
+				return &ExitError{Code: 2, Message: err.Error()}
+			}
+
 			patchResult, err := patch.Apply(context.Background(), patch.Options{
 				Target:       target,
 				PolicyPath:   policyPath,
@@ -81,7 +87,7 @@ func newRemediateCommand() *cobra.Command {
 				return &ExitError{Code: 2, Message: err.Error()}
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "remediation complete: patched=%d baseline=%s report=%s\n", len(patchResult.Changes), baselinePath, reportPath)
+			fmt.Fprintf(cmd.OutOrStdout(), "remediation complete: rotated=%d revoked=%d connector_errors=%d patched=%d baseline=%s report=%s\n", connectorSummary.Rotated, connectorSummary.Revoked, connectorSummary.Errors, len(patchResult.Changes), baselinePath, reportPath)
 			return nil
 		},
 	}
@@ -98,6 +104,51 @@ func newRemediateCommand() *cobra.Command {
 	cmd.Flags().StringVar(&operator, "operator", "unknown", "Operator name/email")
 
 	return cmd
+}
+
+type connectorRemediationSummary struct {
+	Rotated int
+	Revoked int
+	Errors  int
+}
+
+func runConnectorRemediation(ctx context.Context, findings []model.Finding, forcedConnector string) (connectorRemediationSummary, error) {
+	summary := connectorRemediationSummary{}
+	var forced connector.Connector
+	var err error
+	if forcedConnector != "" {
+		forced, err = connector.ByName(forcedConnector)
+		if err != nil {
+			return summary, err
+		}
+	}
+
+	for _, f := range findings {
+		c := forced
+		if c == nil {
+			c = connector.FindByRuleID(f.RuleID)
+		}
+		if c == nil {
+			continue
+		}
+		if f.RawSecret == "" {
+			continue
+		}
+
+		if _, err := c.Rotate(ctx, f.RawSecret); err == nil {
+			summary.Rotated++
+			continue
+		}
+
+		if action, revokeErr := c.Revoke(ctx, f.RawSecret); revokeErr == nil && action != nil && action.Success {
+			summary.Revoked++
+			continue
+		}
+
+		summary.Errors++
+	}
+
+	return summary, nil
 }
 
 func remediateInput(input string, target string, policyPath string, rulesPath string, baselinePath string) ([]model.Finding, model.FindingReport, error) {

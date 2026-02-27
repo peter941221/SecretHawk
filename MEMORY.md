@@ -35,3 +35,5 @@
 - Implemented real AWS connector flow: STS-based validation, IAM revoke, IAM rotate with rollback-on-failure.
 - Added robust AWS connector unit tests using fake STS/IAM clients (no cloud credentials required).
 - Integrated AWS SDK v2 dependencies and verified connector preflight behavior when credentials are missing.
+- Upgraded `remediate --auto` to execute connector remediation attempts (Rotate first, fallback Revoke), then patch/baseline/report.
+- Added connector remediation summary output and tests for forced connector flows.

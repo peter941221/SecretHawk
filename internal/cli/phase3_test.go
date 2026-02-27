@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -125,6 +126,27 @@ func TestHistoryCleanRejectsDirtyRepo(t *testing.T) {
 	root.SetArgs([]string{"history-clean", "--all"})
 	if err := root.Execute(); err == nil {
 		t.Fatal("expected dirty-repo error")
+	}
+}
+
+func TestRunConnectorRemediationUnknownConnector(t *testing.T) {
+	_, err := runConnectorRemediation(context.Background(), []model.Finding{}, "unknown-connector")
+	if err == nil {
+		t.Fatal("expected connector lookup error")
+	}
+}
+
+func TestRunConnectorRemediationForcedGithub(t *testing.T) {
+	findings := []model.Finding{{
+		RuleID:    "github-pat-classic",
+		RawSecret: "ghp_1234567890abcdefghij1234567890abcdef",
+	}}
+	summary, err := runConnectorRemediation(context.Background(), findings, "github")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if summary.Rotated != 1 {
+		t.Fatalf("expected 1 rotated, got %+v", summary)
 	}
 }
 
