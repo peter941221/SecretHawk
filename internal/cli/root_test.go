@@ -15,6 +15,7 @@ func TestRootCommandContainsTopLevelCommands(t *testing.T) {
 		"policy",
 		"connector",
 		"baseline",
+		"growth",
 		"version",
 	}
 

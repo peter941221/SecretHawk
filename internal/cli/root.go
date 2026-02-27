@@ -33,6 +33,7 @@ func NewRootCommand() *cobra.Command {
 		newPolicyCommand(),
 		newConnectorCommand(),
 		newBaselineCommand(),
+		newGrowthCommand(),
 		newVersionCommand(),
 	)
 
