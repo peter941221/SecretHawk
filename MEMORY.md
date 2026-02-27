@@ -32,3 +32,6 @@
 - Implemented `scan --fail-on-active` to gate CI on validated ACTIVE findings only (auto-enables validation).
 - Added confidence refinement in scan pipeline and displayed confidence+status in human output.
 - Updated CI workflow to use `--validate --fail-on-active` and added regression tests for new scan behavior.
+- Implemented real AWS connector flow: STS-based validation, IAM revoke, IAM rotate with rollback-on-failure.
+- Added robust AWS connector unit tests using fake STS/IAM clients (no cloud credentials required).
+- Integrated AWS SDK v2 dependencies and verified connector preflight behavior when credentials are missing.
