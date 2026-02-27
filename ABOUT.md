@@ -6,14 +6,26 @@ SecretHawk is an open-source CLI that helps teams handle leaked secrets from det
 
 ## Elevator Pitch
 
-Most teams can detect leaked secrets, but fixing them quickly is still painful.
-SecretHawk focuses on the full workflow:
+Most teams can detect leaked secrets, but closure is still slow and messy.
+SecretHawk focuses on the full response loop:
 
 ```text
 detect -> validate -> remediate (dry-run or auto path) -> report
 ```
 
-So instead of only getting alerts, you get a repeatable response process.
+Instead of another noisy scanner, you get a repeatable incident operation.
+
+## Product Story
+
+A secret leak is rarely just a "search problem".
+It is a coordination problem across security, engineering, and delivery speed.
+SecretHawk is designed to keep that path clear:
+
+```text
+[Leak Found] -> [Risk Confirmed] -> [Fix Planned] -> [Evidence Written]
+```
+
+The goal is simple: reduce panic, keep auditability, and close incidents faster.
 
 ## What Makes It Different
 

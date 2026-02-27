@@ -1,0 +1,27 @@
+1
+00:00:00,000 --> 00:00:01,900
+We start by building SecretHawk.
+
+2
+00:00:01,900 --> 00:00:03,900
+Now we intentionally recreate a secret leak.
+
+3
+00:00:03,900 --> 00:00:06,800
+Scan runs and flags one critical secret.
+
+4
+00:00:06,800 --> 00:00:08,300
+Next we export JSON findings for automation.
+
+5
+00:00:08,300 --> 00:00:10,300
+Dry-run remediation shows the fix plan safely.
+
+6
+00:00:10,300 --> 00:00:11,600
+Finally, we generate an incident report for the trail.
+
+7
+00:00:11,600 --> 00:00:11,960
+Done: detect, remediate, and report end to end.

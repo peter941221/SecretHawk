@@ -20,12 +20,12 @@ This means less alert noise and faster closure for small engineering teams.
 
 ## Demo (Movie-Style Subtitles)
 
-![SecretHawk vhs headless demo](https://raw.githubusercontent.com/peter941221/SecretHawk/main/docs/assets/demo-vhs-v5.gif)
+![SecretHawk vhs headless demo](https://raw.githubusercontent.com/peter941221/SecretHawk/main/docs/assets/demo-vhs-v6.gif)
 
 Regenerate demo GIF:
 
 ```bash
-vhs docs/vhs/secrethawk-demo.tape
+pwsh docs/vhs/render-demo.ps1
 ```
 
 Demo flow:
@@ -34,10 +34,13 @@ Demo flow:
 [vhs + ttyd]
     |
     v
-[run tape scene by scene]
+[render base terminal gif]
     |
     v
-[render gif to docs/assets]
+[ffmpeg subtitle overlay + palette optimize]
+    |
+    v
+[movie-style gif in docs/assets]
 ```
 
 ## Start In 60 Seconds
@@ -52,7 +55,7 @@ go build ./cmd/secrethawk
 
 ```text
 Scene 1: Secret gets committed by mistake
-Scene 2: scan finds it
+Scene 2: scan finds it and rates severity
 Scene 3: validate clarifies risk state
 Scene 4: remediate prepares rotate/revoke + patch actions
 Scene 5: report creates a traceable incident record
