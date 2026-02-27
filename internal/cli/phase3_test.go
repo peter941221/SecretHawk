@@ -42,6 +42,49 @@ func TestValidateRequiresInputOrSecret(t *testing.T) {
 	}
 }
 
+func TestValidateInputSkipsRedactedSecrets(t *testing.T) {
+	tmp := t.TempDir()
+	inputPath := filepath.Join(tmp, "findings.json")
+	payload := model.FindingReport{
+		Findings: []model.Finding{{
+			ID:       "f-1",
+			RuleID:   "github-pat-classic",
+			RuleName: "GitHub PAT Classic",
+			Severity: "high",
+			Location: model.Location{File: "x.txt", LineStart: 1, LineEnd: 1},
+			Match:    model.Match{RawRedacted: "ghp_1234...abcd", Length: 40},
+		}},
+		Metadata: model.Metadata{Version: "test", ScannedAt: time.Now().UTC()},
+	}
+	data, err := json.Marshal(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(inputPath, data, 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	root := NewRootCommand()
+	var out bytes.Buffer
+	root.SetOut(&out)
+	root.SetErr(&out)
+	root.SetArgs([]string{"validate", "--input", inputPath})
+	if err := root.Execute(); err != nil {
+		t.Fatalf("validate input failed: %v", err)
+	}
+
+	var got model.FindingReport
+	if err := json.Unmarshal(out.Bytes(), &got); err != nil {
+		t.Fatalf("parse validate output failed: %v output=%s", err, out.String())
+	}
+	if len(got.Findings) != 1 {
+		t.Fatalf("unexpected findings count: %d", len(got.Findings))
+	}
+	if got.Findings[0].Validation.Method != "redacted-input" || got.Findings[0].Validation.Status != "unknown" {
+		t.Fatalf("unexpected validation result: %+v", got.Findings[0].Validation)
+	}
+}
+
 func TestPatchDryRunCommand(t *testing.T) {
 	tmp := t.TempDir()
 	file := filepath.Join(tmp, "app.py")

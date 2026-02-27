@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/peter941221/secrethawk/internal/connector"
@@ -59,6 +60,12 @@ func newValidateCommand() *cobra.Command {
 					report.Findings[i].Validation.Method = "no-connector"
 					continue
 				}
+				if looksRedacted(report.Findings[i].Match.RawRedacted) {
+					report.Findings[i].Validation.Status = "unknown"
+					report.Findings[i].Validation.Method = "redacted-input"
+					report.Findings[i].Validation.Details = map[string]any{"hint": "provide raw secret for direct validation"}
+					continue
+				}
 				status, details := connector.ValidateWithConnector(context.Background(), c, report.Findings[i].Match.RawRedacted)
 				report.Findings[i].Validation.Status = status
 				report.Findings[i].Validation.Method = c.Name()
@@ -102,4 +109,12 @@ func writeValidationResult(cmd *cobra.Command, output string, result map[string]
 	}
 	fmt.Fprintln(cmd.OutOrStdout(), string(payload))
 	return nil
+}
+
+func looksRedacted(v string) bool {
+	trimmed := strings.TrimSpace(v)
+	if trimmed == "" {
+		return true
+	}
+	return strings.Contains(trimmed, "...")
 }

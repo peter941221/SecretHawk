@@ -37,3 +37,5 @@
 - Integrated AWS SDK v2 dependencies and verified connector preflight behavior when credentials are missing.
 - Upgraded `remediate --auto` to execute connector remediation attempts (Rotate first, fallback Revoke), then patch/baseline/report.
 - Added connector remediation summary output and tests for forced connector flows.
+- Improved `validate --input` behavior: redacted values now map to `unknown/redacted-input` instead of connector error noise.
+- Added regression test to ensure redacted findings from JSON reports are handled safely.
