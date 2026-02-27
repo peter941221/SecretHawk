@@ -34,3 +34,7 @@ MEMORY.md
 RUNBOOK.md
 PERSONAL_*.md
 PRIVATE_*.md
+
+# vhs local generated intermediate files
+docs/vhs/findings.json
+docs/vhs/incident.md

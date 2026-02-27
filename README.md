@@ -20,17 +20,25 @@ go build ./cmd/secrethawk
 
 ## Demo
 
-![SecretHawk terminal replay demo](assets/demo-terminal-real.gif)
+![SecretHawk vhs headless demo](docs/assets/demo-vhs.gif)
 
-Regenerate demo GIF (real CLI output replay, not screen recording):
+Regenerate demo GIF (headless flow with `vhs`):
 
 ```bash
-python scripts/generate_demo_gif_real.py
+vhs docs/vhs/secrethawk-demo.tape
 ```
 
-Reference transcript:
+Demo flow:
 
-- `assets/demo-terminal-real.txt`
+```text
+[vhs + ttyd]
+    |
+    v
+[run tape commands]
+    |
+    v
+[render gif to docs/assets]
+```
 
 ## Why SecretHawk
 
