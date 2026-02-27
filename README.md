@@ -20,13 +20,12 @@ go build ./cmd/secrethawk
 
 ## Demo
 
-```text
-Problem: A leaked key is detected in source.
-SecretHawk flow:
-scan -> validate -> rotate/revoke -> patch -> report
-Outcome:
-- active secret can be blocked in CI
-- remediation artifacts are generated for follow-up
+![SecretHawk terminal demo](assets/demo-terminal.gif)
+
+Regenerate demo GIF:
+
+```bash
+python scripts/generate_demo_gif.py
 ```
 
 ## Why SecretHawk
