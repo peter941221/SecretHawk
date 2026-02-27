@@ -1,4 +1,4 @@
-Output docs/assets/demo-vhs-v3.gif
+Output docs/assets/demo-vhs-v4.gif
 Set Shell "pwsh"
 Set FontSize 18
 Set Width 1200
@@ -6,11 +6,11 @@ Set Height 720
 Set Theme "Catppuccin Mocha"
 Set TypingSpeed 8ms
 
-Type 'Write-Host "字幕 0/6：演示从检测到报告的闭环" -ForegroundColor Yellow'
+Type 'Write-Host "Caption 0/6: We are about to run the full secret-response flow." -ForegroundColor Yellow'
 Enter
 Sleep 1000ms
 
-Type 'Write-Host "字幕 1/6：先编译 CLI，确保后续命令可执行" -ForegroundColor Cyan'
+Type 'Write-Host "Caption 1/6: First, build the CLI so every command below can run." -ForegroundColor Cyan'
 Enter
 Sleep 800ms
 
@@ -18,7 +18,7 @@ Type "go build ./cmd/secrethawk"
 Enter
 Sleep 1200ms
 
-Type 'Write-Host "字幕 2/6：写入演示密钥，模拟泄漏场景" -ForegroundColor Cyan'
+Type 'Write-Host "Caption 2/6: Now we add a fake leaked key to simulate a real mistake." -ForegroundColor Cyan'
 Enter
 Sleep 800ms
 
@@ -34,7 +34,7 @@ Type 'Add-Content -Encoding utf8 docs/vhs/demo-src/app.py "SERVICE_URL = `"https
 Enter
 Sleep 900ms
 
-Type 'Write-Host "字幕 3/6：执行扫描，预期看到 CRITICAL 命中" -ForegroundColor Cyan'
+Type 'Write-Host "Caption 3/6: Run scan. You should see one CRITICAL secret finding." -ForegroundColor Cyan'
 Enter
 Sleep 800ms
 
@@ -42,7 +42,7 @@ Type "./secrethawk.exe scan docs/vhs/demo-src --format human"
 Enter
 Sleep 1800ms
 
-Type 'Write-Host "字幕 4/6：导出 findings.json 给修复流程" -ForegroundColor Cyan'
+Type 'Write-Host "Caption 4/6: Export findings to JSON so remediation can use it." -ForegroundColor Cyan'
 Enter
 Sleep 800ms
 
@@ -50,7 +50,7 @@ Type "./secrethawk.exe scan docs/vhs/demo-src --format json --output docs/vhs/fi
 Enter
 Sleep 1100ms
 
-Type 'Write-Host "字幕 5/6：自动修复 dry-run（不改代码）" -ForegroundColor Cyan'
+Type 'Write-Host "Caption 5/6: Run remediation in dry-run mode. No files are changed." -ForegroundColor Cyan'
 Enter
 Sleep 800ms
 
@@ -58,7 +58,7 @@ Type "./secrethawk.exe remediate --input docs/vhs/findings.json --auto --dry-run
 Enter
 Sleep 1800ms
 
-Type 'Write-Host "字幕 6/6：生成 incident report 便于复盘" -ForegroundColor Cyan'
+Type 'Write-Host "Caption 6/6: Generate an incident report for tracking and follow-up." -ForegroundColor Cyan'
 Enter
 Sleep 800ms
 
@@ -66,6 +66,6 @@ Type "./secrethawk.exe report --input docs/vhs/findings.json --output docs/vhs/i
 Enter
 Sleep 1800ms
 
-Type 'Write-Host "完成：你看到的是 Detect -> Remediate(dry-run) -> Report 闭环" -ForegroundColor Green'
+Type 'Write-Host "Done: Detect -> Remediate (dry-run) -> Report in one repeatable flow." -ForegroundColor Green'
 Enter
 Sleep 1800ms
