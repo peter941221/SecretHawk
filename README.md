@@ -20,7 +20,7 @@ go build ./cmd/secrethawk
 
 ## Demo
 
-![SecretHawk vhs headless demo](docs/assets/demo-vhs.gif)
+![SecretHawk vhs headless demo](docs/assets/demo-vhs-v2.gif)
 
 Regenerate demo GIF (headless flow with `vhs`):
 
