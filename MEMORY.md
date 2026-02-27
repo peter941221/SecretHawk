@@ -53,3 +53,7 @@
 - Researched full-funnel growth automation feasibility for SecretHawk using latest platform policies (X, Product Hunt, LinkedIn, Reddit, Hacker News).
 - Determined that fully autonomous promotion is not realistic/compliant across all channels; several channels require explicit user action, approvals, or prohibit surprise automation/spam-like behavior.
 - Defined recommended operating model as Human-in-the-Loop Growth Ops: automate research/content drafting/scheduling/reply triage/analytics, keep final publish and high-impact interactions as human approval steps.
+- Implemented Growth Ops workflow in CLI via new `growth` command group (`init`, `plan`, `approve`, `export`).
+- Added `internal/growth` engine for campaign brief validation, queue generation, UTM link construction, human approval gating, and approved-card export.
+- Added regression tests for growth engine and end-to-end CLI flow.
+- Updated run docs (`README.md`, `RUNBOOK.md`) and ignored local growth execution artifacts (`.secrethawk/growth/queue.json`, `.secrethawk/growth/out/`).

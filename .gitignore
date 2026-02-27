@@ -24,6 +24,8 @@ Thumbs.db
 # SecretHawk local state
 .secrethawk/reports/
 .secrethawk/tmp/
+.secrethawk/growth/queue.json
+.secrethawk/growth/out/
 
 # Local planning/research docs (keep local, do not sync)
 技术文档.md

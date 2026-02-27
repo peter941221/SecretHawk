@@ -23,6 +23,11 @@ secrethawk
 ├── baseline
 │   ├── create
 │   └── update
+├── growth
+│   ├── init     # initialize campaign brief template
+│   ├── plan     # generate cross-channel draft queue with UTM links
+│   ├── approve  # human approval gate for one queue item
+│   └── export   # export approved publish cards for manual posting
 └── version
 ```
 
@@ -33,6 +38,8 @@ go test ./...
 go build ./cmd/secrethawk
 ./secrethawk.exe scan . --format human
 ./secrethawk.exe scan . --validate --fail-on high --fail-on-active
+./secrethawk.exe growth init
+./secrethawk.exe growth plan --brief .secrethawk/growth/campaign.yaml
 ```
 
 ## CI / Hook
@@ -45,3 +52,4 @@ go build ./cmd/secrethawk
 - Connectors currently include `aws` and `github` with preflight + validation helpers.
 - `scan --validate` uses connector mapping when rule/connector are known.
 - `history-clean` enforces clean working tree and backup branch safeguards.
+- `growth` is a Human-in-the-Loop growth workflow (draft -> approve -> export) and intentionally avoids direct autonomous posting to reduce policy/compliance risk.
