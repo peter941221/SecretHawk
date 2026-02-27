@@ -7,16 +7,31 @@
 
 > A practical CLI for secret incidents: find it, verify it, clean it up, report it.
 
-## In Plain English
+## Why Teams Care
 
-Most secret tools stop at detection.
-SecretHawk keeps going:
+Most tools stop at: "we found something."
+SecretHawk continues to: "here is how we close the incident."
 
 ```text
-[Find leak] -> [Verify risk] -> [Plan fix] -> [Generate report]
+[Detect leak] -> [Validate if active] -> [Plan remediation] -> [Generate incident report]
 ```
 
-This means less alert noise and faster closure for small engineering teams.
+For small teams, this means fewer noisy blocks and faster real closure.
+
+## 10-Second Tour
+
+- Watch the terminal demo: [Demo GIF](https://raw.githubusercontent.com/peter941221/SecretHawk/main/docs/assets/demo-vhs-v6.gif)
+- Run it in one minute: see `Start In 60 Seconds` below
+- Explore capabilities: jump to `Command Map`
+
+## Scanner vs SecretHawk
+
+| Typical secret scanner | SecretHawk |
+| --- | --- |
+| Finds leaked patterns | Finds + validates + drives response |
+| Leaves remediation as manual work | Supports dry-run and auto remediation flow |
+| Limited incident trace | Generates report artifacts for incident trail |
+| Easy to create alert fatigue | Supports practical CI gates (`--fail-on-active`) |
 
 ## Demo (Movie-Style Subtitles)
 
