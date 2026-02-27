@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Generate a terminal demo GIF from real SecretHawk command outputs."""
+"""Generate a terminal demo GIF from real SecretHawk outputs (replay style)."""
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import tempfile
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
@@ -20,6 +22,7 @@ LINE_HEIGHT = 28
 FRAME_MS = 85
 WRAP_WIDTH = 110
 MAX_OUTPUT_LINES_PER_COMMAND = 8
+CMD_TIMEOUT_SEC = 90
 
 BG = (12, 17, 30)
 PANEL = (19, 26, 43)
@@ -86,12 +89,12 @@ def wrap_line(line: str, width: int = WRAP_WIDTH) -> List[str]:
 
 def ensure_binary(repo_root: Path) -> Path:
     exe = repo_root / "secrethawk.exe"
-    if exe.exists():
-        return exe
-    cmd = ["go", "build", "./cmd/secrethawk"]
-    result = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(f"go build failed:\n{result.stdout}\n{result.stderr}")
+    skip_build = os.getenv("SECRETHAWK_DEMO_SKIP_BUILD", "0") == "1"
+    if not skip_build or not exe.exists():
+        cmd = ["go", "build", "./cmd/secrethawk"]
+        result = subprocess.run(cmd, cwd=repo_root, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise RuntimeError(f"go build failed:\n{result.stdout}\n{result.stderr}")
     if not exe.exists():
         raise RuntimeError("secrethawk.exe not found after build")
     return exe
@@ -115,10 +118,12 @@ def create_demo_workspace(root: Path) -> Path:
     return demo
 
 
-def run(cmd: list[str], cwd: Path) -> tuple[int, str]:
-    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+def run(cmd: list[str], cwd: Path) -> tuple[int, str, float]:
+    start = time.perf_counter()
+    result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=CMD_TIMEOUT_SEC)
+    elapsed = time.perf_counter() - start
     combined = (result.stdout or "") + (result.stderr or "")
-    return result.returncode, sanitize(combined)
+    return result.returncode, sanitize(combined), elapsed
 
 
 def build_events(exe: Path, workspace: Path) -> tuple[list[Event], str]:
@@ -144,15 +149,16 @@ def build_events(exe: Path, workspace: Path) -> tuple[list[Event], str]:
         ),
     ]
 
-    events: list[Event] = [Event("info", "SecretHawk Real CLI Demo (captured output)", hold=8)]
+    events: list[Event] = [Event("info", "SecretHawk demo: real command output replay", hold=8)]
     transcript: list[str] = []
 
     for cmd, display in commands:
-        code, output = run(cmd, cwd=exe.parent)
+        code, output, elapsed = run(cmd, cwd=exe.parent)
         output = redact_paths(output, workspace)
-        transcript.append(f"$ {display}\n{output}\n[exit={code}]\n")
+        transcript.append(f"$ {display}\n{output}\n[exit={code}] [duration={elapsed:.2f}s]\n")
 
         events.append(Event("command", f"PS C:\\repo\\SecretHawk> {display}", hold=2))
+        events.append(Event("output", f"[duration: {elapsed:.2f}s]", hold=1))
         if not output.strip():
             output_lines = ["(no output)"]
         else:
@@ -166,7 +172,7 @@ def build_events(exe: Path, workspace: Path) -> tuple[list[Event], str]:
         if code != 0:
             events.append(Event("output", f"[exit code: {code}]", hold=2))
 
-    events.append(Event("info", "Done. This demo uses real command output capture.", hold=10))
+    events.append(Event("info", "Done. Replay rendered from real command outputs.", hold=10))
     return events, "\n".join(transcript)
 
 
@@ -182,7 +188,7 @@ def line_color(kind: str, text: str) -> tuple[int, int, int]:
     return TEXT
 
 
-def render_frame(lines: List[tuple[str, str]], font: ImageFont.ImageFont, partial: str = "", cursor: bool = False) -> Image.Image:
+def render_frame(lines: List[tuple[str, str]], font: ImageFont.ImageFont) -> Image.Image:
     img = Image.new("RGB", (WIDTH, HEIGHT), BG)
     draw = ImageDraw.Draw(img)
 
@@ -202,9 +208,6 @@ def render_frame(lines: List[tuple[str, str]], font: ImageFont.ImageFont, partia
         draw.text((PADDING + 12, y), text, font=font, fill=line_color(kind, text))
         y += LINE_HEIGHT
 
-    if partial:
-        c = "_" if cursor else " "
-        draw.text((PADDING + 12, y), partial + c, font=font, fill=GREEN)
     return img
 
 
@@ -214,17 +217,6 @@ def build_frames(events: list[Event]) -> list[Image.Image]:
     lines: list[tuple[str, str]] = []
 
     for event in events:
-        if event.kind == "command":
-            full = event.text
-            step = 3
-            for i in range(1, len(full) + 1, step):
-                partial = full[:i]
-                frames.append(render_frame(lines, font, partial=partial, cursor=True))
-            lines.append((full, event.kind))
-            for _ in range(event.hold):
-                frames.append(render_frame(lines, font))
-            continue
-
         lines.append((event.text, event.kind))
         for _ in range(event.hold):
             frames.append(render_frame(lines, font))

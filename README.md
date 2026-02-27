@@ -20,9 +20,9 @@ go build ./cmd/secrethawk
 
 ## Demo
 
-![SecretHawk real terminal demo](assets/demo-terminal-real.gif)
+![SecretHawk terminal replay demo](assets/demo-terminal-real.gif)
 
-Regenerate demo GIF (real CLI output capture):
+Regenerate demo GIF (real CLI output replay, not screen recording):
 
 ```bash
 python scripts/generate_demo_gif_real.py
