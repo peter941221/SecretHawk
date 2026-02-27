@@ -45,3 +45,5 @@
 - Added scan metadata aggregations: `severity_counts`, `validation_counts`, and `confidence_counts`.
 - Enhanced human output with structured summary lines for severity and validation distributions.
 - Added regression tests for metadata aggregation and human summary rendering.
+- Enhanced GitHub connector: validate uses resilient API calls; revoke now supports automatic Applications API revoke when `GITHUB_APP_CLIENT_ID/SECRET` are configured.
+- Added GitHub connector tests for validate, manual fallback revoke, and API revoke success path.
