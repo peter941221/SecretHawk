@@ -20,13 +20,17 @@ go build ./cmd/secrethawk
 
 ## Demo
 
-![SecretHawk terminal demo](assets/demo-terminal.gif)
+![SecretHawk real terminal demo](assets/demo-terminal-real.gif)
 
-Regenerate demo GIF:
+Regenerate demo GIF (real CLI output capture):
 
 ```bash
-python scripts/generate_demo_gif.py
+python scripts/generate_demo_gif_real.py
 ```
+
+Reference transcript:
+
+- `assets/demo-terminal-real.txt`
 
 ## Why SecretHawk
 
