@@ -8,11 +8,56 @@
 SecretHawk is an open-source CLI for end-to-end secret incident handling:
 detect, validate, rotate/revoke, patch, baseline, and report.
 
+> Built for teams who want fewer false positives and faster incident closure.
+
+## Start In 60 Seconds
+
+```bash
+go build ./cmd/secrethawk
+./secrethawk.exe scan . --validate --fail-on high --fail-on-active
+./secrethawk.exe remediate --auto
+```
+
+## Demo
+
+```text
+Problem: A leaked key is detected in source.
+SecretHawk flow:
+scan -> validate -> rotate/revoke -> patch -> report
+Outcome:
+- active secret can be blocked in CI
+- remediation artifacts are generated for follow-up
+```
+
 ## Why SecretHawk
 
 - Detection is not enough. SecretHawk focuses on remediation flow, not only alerts.
 - CI blocking can be noisy. SecretHawk can block on validated active findings.
 - Small teams need practical workflows. SecretHawk ships with defaults and guardrails.
+
+## Where It Fits
+
+| Need | SecretHawk |
+|---|---|
+| Local dev + CI secret gate | Yes |
+| Validity-aware CI blocking | Yes (`--fail-on-active`) |
+| Rotate/revoke orchestration | Yes (connector-based) |
+| Patch + baseline + incident report | Yes |
+| Team governance workflow | In progress |
+
+## Comparison Snapshot
+
+| Capability | SecretHawk | Gitleaks | TruffleHog | GitHub Secret Scanning |
+|---|---|---|---|---|
+| CLI scan for repos/workspace | Yes | Yes | Yes | Partial (GitHub-centric) |
+| Validation status in findings | Yes | Limited | Yes | Partial |
+| Auto remediation workflow | Yes (current focus) | Limited | Limited | Guided process |
+| CI fail on validated active | Yes | No (native equivalent) | Partial (custom logic) | Partial |
+| Local-first OSS workflow | Yes | Yes | Yes | No |
+
+Notes:
+- This table is a practical positioning view for onboarding, not a benchmark.
+- Each tool has strengths; many teams combine multiple tools.
 
 ## Incident Lifecycle
 
@@ -68,6 +113,13 @@ go build ./cmd/secrethawk
 ./secrethawk.exe report --input findings.json
 ```
 
+### 4) Try growth workflow (optional)
+
+```bash
+./secrethawk.exe growth init --path .secrethawk/growth/campaign.yaml
+./secrethawk.exe growth plan --brief .secrethawk/growth/campaign.yaml --output .secrethawk/growth/queue.json
+```
+
 ## Command Map
 
 ```text
@@ -120,6 +172,12 @@ secrethawk
 ```
 
 This command group intentionally keeps final publishing as a manual step for platform-policy safety.
+
+## Who Should Use SecretHawk
+
+- DevSecOps teams that need practical remediation, not only detection.
+- Startups and indie builders with limited security headcount.
+- Engineering teams adopting secret hygiene into CI/CD incrementally.
 
 ## Roadmap Snapshot
 
