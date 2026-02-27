@@ -57,3 +57,5 @@
 - Added `internal/growth` engine for campaign brief validation, queue generation, UTM link construction, human approval gating, and approved-card export.
 - Added regression tests for growth engine and end-to-end CLI flow.
 - Updated run docs (`README.md`, `RUNBOOK.md`) and ignored local growth execution artifacts (`.secrethawk/growth/queue.json`, `.secrethawk/growth/out/`).
+- Re-validated launch readiness: repository clean/synced, full `go test ./...` pass, and `growth` command help verified.
+- Re-checked platform policy boundaries for automation (X/LinkedIn/Reddit/Hacker News/Product Hunt) and confirmed current GTM model should remain Human-in-the-Loop for compliance and account safety.
