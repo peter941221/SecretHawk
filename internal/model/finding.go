@@ -57,13 +57,16 @@ type Remediation struct {
 }
 
 type Metadata struct {
-	Tool         string    `json:"tool"`
-	Version      string    `json:"version"`
-	ScannedAt    time.Time `json:"scanned_at"`
-	ScanTarget   string    `json:"scan_target"`
-	ScanMode     string    `json:"scan_mode"`
-	FilesScanned int       `json:"files_scanned"`
-	DurationMS   int64     `json:"duration_ms"`
-	RulesLoaded  int       `json:"rules_loaded"`
-	PolicyFile   string    `json:"policy_file"`
+	Tool             string         `json:"tool"`
+	Version          string         `json:"version"`
+	ScannedAt        time.Time      `json:"scanned_at"`
+	ScanTarget       string         `json:"scan_target"`
+	ScanMode         string         `json:"scan_mode"`
+	FilesScanned     int            `json:"files_scanned"`
+	DurationMS       int64          `json:"duration_ms"`
+	RulesLoaded      int            `json:"rules_loaded"`
+	PolicyFile       string         `json:"policy_file"`
+	SeverityCounts   map[string]int `json:"severity_counts,omitempty"`
+	ValidationCounts map[string]int `json:"validation_counts,omitempty"`
+	ConfidenceCounts map[string]int `json:"confidence_counts,omitempty"`
 }

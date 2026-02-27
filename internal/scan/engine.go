@@ -155,15 +155,18 @@ func Run(ctx context.Context, opts Options) (Result, error) {
 		Schema:   "https://secrethawk.dev/schemas/finding-v1.json",
 		Findings: filtered,
 		Metadata: model.Metadata{
-			Tool:         "secrethawk",
-			Version:      opts.Version,
-			ScannedAt:    opts.Now,
-			ScanTarget:   opts.Target,
-			ScanMode:     mode,
-			FilesScanned: filesScanned,
-			DurationMS:   time.Since(start).Milliseconds(),
-			RulesLoaded:  len(allRules),
-			PolicyFile:   opts.PolicyPath,
+			Tool:             "secrethawk",
+			Version:          opts.Version,
+			ScannedAt:        opts.Now,
+			ScanTarget:       opts.Target,
+			ScanMode:         mode,
+			FilesScanned:     filesScanned,
+			DurationMS:       time.Since(start).Milliseconds(),
+			RulesLoaded:      len(allRules),
+			PolicyFile:       opts.PolicyPath,
+			SeverityCounts:   countBySeverity(filtered),
+			ValidationCounts: countByValidation(filtered),
+			ConfidenceCounts: countByConfidence(filtered),
 		},
 	}
 
@@ -637,4 +640,40 @@ func parseInt(s string) int {
 		n = n*10 + int(r-'0')
 	}
 	return n
+}
+
+func countBySeverity(findings []model.Finding) map[string]int {
+	out := map[string]int{"critical": 0, "high": 0, "medium": 0, "low": 0}
+	for _, f := range findings {
+		if _, ok := out[f.Severity]; ok {
+			out[f.Severity]++
+			continue
+		}
+		out[f.Severity]++
+	}
+	return out
+}
+
+func countByValidation(findings []model.Finding) map[string]int {
+	out := map[string]int{"active": 0, "inactive": 0, "unknown": 0, "error": 0}
+	for _, f := range findings {
+		status := strings.TrimSpace(f.Validation.Status)
+		if status == "" {
+			status = "unknown"
+		}
+		out[status]++
+	}
+	return out
+}
+
+func countByConfidence(findings []model.Finding) map[string]int {
+	out := map[string]int{"high": 0, "medium": 0, "low": 0}
+	for _, f := range findings {
+		level := strings.TrimSpace(f.Confidence)
+		if level == "" {
+			level = "medium"
+		}
+		out[level]++
+	}
+	return out
 }

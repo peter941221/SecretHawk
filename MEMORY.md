@@ -42,3 +42,6 @@
 - Added GitHub Actions secret sync module (`internal/cisync`) with libsodium sealed-box encryption and API integration.
 - Integrated optional sync into `remediate --auto` via `--sync-github-actions`, `--github-repo`, and `--github-token-env`.
 - Added unit tests for GitHub Actions sync client and remediation sync orchestration.
+- Added scan metadata aggregations: `severity_counts`, `validation_counts`, and `confidence_counts`.
+- Enhanced human output with structured summary lines for severity and validation distributions.
+- Added regression tests for metadata aggregation and human summary rendering.

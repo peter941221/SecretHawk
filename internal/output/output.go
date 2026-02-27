@@ -35,6 +35,22 @@ func writeHuman(report model.FindingReport, w io.Writer) {
 		fmt.Fprintln(w)
 	}
 	fmt.Fprintf(w, "Summary: %d findings\n", len(report.Findings))
+	if len(report.Metadata.SeverityCounts) > 0 {
+		fmt.Fprintf(w, "  Severity: critical=%d high=%d medium=%d low=%d\n",
+			report.Metadata.SeverityCounts["critical"],
+			report.Metadata.SeverityCounts["high"],
+			report.Metadata.SeverityCounts["medium"],
+			report.Metadata.SeverityCounts["low"],
+		)
+	}
+	if len(report.Metadata.ValidationCounts) > 0 {
+		fmt.Fprintf(w, "  Validation: active=%d inactive=%d unknown=%d error=%d\n",
+			report.Metadata.ValidationCounts["active"],
+			report.Metadata.ValidationCounts["inactive"],
+			report.Metadata.ValidationCounts["unknown"],
+			report.Metadata.ValidationCounts["error"],
+		)
+	}
 }
 
 func writeJSON(report model.FindingReport, w io.Writer) error {

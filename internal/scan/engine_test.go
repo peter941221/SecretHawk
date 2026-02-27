@@ -36,6 +36,12 @@ func TestRunDetectsAWSKey(t *testing.T) {
 	if res.Report.Findings[0].RuleID != "aws-access-key-id" {
 		t.Fatalf("unexpected rule id: %s", res.Report.Findings[0].RuleID)
 	}
+	if res.Report.Metadata.SeverityCounts["critical"] < 1 {
+		t.Fatalf("expected critical severity count, got %+v", res.Report.Metadata.SeverityCounts)
+	}
+	if res.Report.Metadata.ValidationCounts["unknown"] < 1 {
+		t.Fatalf("expected unknown validation count, got %+v", res.Report.Metadata.ValidationCounts)
+	}
 }
 
 func TestRunRespectsAllowlistPattern(t *testing.T) {
