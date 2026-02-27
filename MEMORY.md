@@ -47,3 +47,9 @@
 - Added regression tests for metadata aggregation and human summary rendering.
 - Enhanced GitHub connector: validate uses resilient API calls; revoke now supports automatic Applications API revoke when `GITHUB_APP_CLIENT_ID/SECRET` are configured.
 - Added GitHub connector tests for validate, manual fallback revoke, and API revoke success path.
+
+## 2026-02-27
+
+- Researched full-funnel growth automation feasibility for SecretHawk using latest platform policies (X, Product Hunt, LinkedIn, Reddit, Hacker News).
+- Determined that fully autonomous promotion is not realistic/compliant across all channels; several channels require explicit user action, approvals, or prohibit surprise automation/spam-like behavior.
+- Defined recommended operating model as Human-in-the-Loop Growth Ops: automate research/content drafting/scheduling/reply triage/analytics, keep final publish and high-impact interactions as human approval steps.
